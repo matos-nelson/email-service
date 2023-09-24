@@ -1,0 +1,26 @@
+version: '3.8'
+
+name: email-service-container
+services:
+  app:
+    image: 'quarkus/email-service'
+    container_name: "email-service"
+    ports:
+      - '8080:8080'
+
+  localstack:
+    container_name: "localstack-ses"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test-key
+      AWS_SECRET_ACCESS_KEY: test-secret
+      FROM_EMAIL: from-testemail@example.com
+      TO_EMAIL: to-testemail@example.com
+      DEBUG: ${DEBUG:-1}
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - ./../scripts/init-ses.sh:/etc/localstack/init/ready.d/init-ses.sh
